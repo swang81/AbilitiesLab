@@ -3,7 +3,7 @@
 
 #include "LabHealthAttributeSet.h"
 #include "Net/UnrealNetwork.h"
-
+#include "GameplayEffectExtension.h"
 
 
 void ULabHealthAttributeSet::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
@@ -39,6 +39,26 @@ void ULabHealthAttributeSet::PostAttributeChange(const FGameplayAttribute& Attri
 	{
 		const float CurrentHealth = GetHealth();
 		OnHealthChanged.Broadcast(this, CurrentHealth, CurrentHealth);
+	}
+	
+}
+
+void ULabHealthAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data)
+{
+	Super::PostGameplayEffectExecute(Data);
+	if (Data.EvaluatedData.Attribute == GetDamageAttribute() )
+	{
+		const float DamageValue = GetDamage();
+		const float OldHealthValue = GetHealth();
+		const float MaxHealthValue = GetMaxHealth();
+		const float NewHealthValue = FMath::Clamp(OldHealthValue -DamageValue, 0.0f, MaxHealthValue);
+
+		if (OldHealthValue != NewHealthValue)
+		{
+			SetHealth(NewHealthValue);
+		}
+
+		SetDamage(0.0f);
 	}
 	
 }

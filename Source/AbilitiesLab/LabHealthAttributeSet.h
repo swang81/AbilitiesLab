@@ -5,12 +5,14 @@
 #include "CoreMinimal.h"
 #include "AttributeSet.h"
 #include "AbilitySystemComponent.h"
+
+
 #include "LabHealthAttributeSet.generated.h"
 
 /**
  * 
  */
-
+struct FGameplayEffectModCallbackData;
 
 #define ATTRIBUTE_ACCESSORS(ClassName, PropertyName) \
 GAMEPLAYATTRIBUTE_PROPERTY_GETTER(ClassName, PropertyName) \
@@ -20,6 +22,8 @@ GAMEPLAYATTRIBUTE_VALUE_INITTER(PropertyName)
 
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FAttributeChangedEvent, UAttributeSet*, AttributeSet, float, OldValue, float, NewValue);
+
+
 
 UCLASS()
 class ABILITIESLAB_API ULabHealthAttributeSet : public UAttributeSet
@@ -34,19 +38,24 @@ public:
 	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
 	
 	virtual void PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue) override;
-	
+
+	virtual void PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data) override;
 
 	UPROPERTY(BlueprintAssignable)
 	FAttributeChangedEvent OnHealthChanged;
 
 	
 	// Current health
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_Health)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_Health, meta = (HideFromModifiers))
 	FGameplayAttributeData Health;
 	
 	// Upper limit for health value
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_MaxHealth)
 	FGameplayAttributeData MaxHealth;
+
+	UPROPERTY(VisibleAnywhere)
+	FGameplayAttributeData Damage;
+	ATTRIBUTE_ACCESSORS(ULabHealthAttributeSet,Damage);
 	
 	ATTRIBUTE_ACCESSORS(ULabHealthAttributeSet, Health);
 	ATTRIBUTE_ACCESSORS(ULabHealthAttributeSet, MaxHealth);
