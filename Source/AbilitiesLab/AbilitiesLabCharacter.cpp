@@ -13,6 +13,7 @@
 #include "LabAbilitySystemComponent.h"
 #include "LabHealthAttributeSet.h"
 
+
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
 //////////////////////////////////////////////////////////////////////////
@@ -95,6 +96,11 @@ void AAbilitiesLabCharacter::SetupPlayerInputComponent(UInputComponent* PlayerIn
 	{
 		UE_LOG(LogTemplateCharacter, Error, TEXT("'%s' Failed to find an Enhanced Input component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."), *GetNameSafe(this));
 	}
+
+	const FTopLevelAssetPath EnumName("/Script/AbilitiesLab.EMyAbilitySlotsEnum");
+	FGameplayAbilityInputBinds Binds("ConfirmTargeting","CancelTargeting", EnumName);
+	LabAbilitySystemComp->BindAbilityActivationToInputComponent(PlayerInputComponent,Binds);
+	
 }
 
 void AAbilitiesLabCharacter::Move(const FInputActionValue& Value)
