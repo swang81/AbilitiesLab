@@ -46,6 +46,9 @@ void ULabHealthAttributeSet::PostAttributeChange(const FGameplayAttribute& Attri
 void ULabHealthAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data)
 {
 	Super::PostGameplayEffectExecute(Data);
+
+	UE_LOG(LogTemp, Warning, TEXT("PostApply: Gameplay Effect '%s' effect"), *Data.EffectSpec.Def->GetClass()->GetName());
+	
 	if (Data.EvaluatedData.Attribute == GetDamageAttribute() )
 	{
 		const float DamageValue = GetDamage();
@@ -56,6 +59,16 @@ void ULabHealthAttributeSet::PostGameplayEffectExecute(const struct FGameplayEff
 		if (OldHealthValue != NewHealthValue)
 		{
 			SetHealth(NewHealthValue);
+
+			const float DamageNumber = OldHealthValue - NewHealthValue;
+			if (UAbilitySystemComponent* OwningAbilitySystemComponent = GetValid(GetOwningAbilitySystemComponent()))
+			{
+				const FGameplayTag DamageCueTag = FGameplayTag::RequestGameplayTag(FName("GameplayCue.DamageNumber"),true);
+				FGameplayCueParameters DamageCueParams;
+				DamageCueParams.NormalizedMagnitude = 1.f;
+				DamageCueParams.RawMagnitude = DamageNumber;
+				OwningAbilitySystemComponent->ExecuteGameplayCue(DamageCueTag,DamageCueParams);
+			}
 		}
 
 		SetDamage(0.0f);

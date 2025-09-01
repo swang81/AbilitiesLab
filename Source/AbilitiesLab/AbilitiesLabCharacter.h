@@ -7,7 +7,9 @@
 #include "Logging/LogMacros.h"
 #include "AbilitySystemInterface.h"
 #include "LabAbilitySystemComponent.h"
+#include "MyAbilitySlotsEnum.h"
 #include "AbilitiesLabCharacter.generated.h"
+
 
 class USpringArmComponent;
 class UCameraComponent;
@@ -75,6 +77,10 @@ protected:
 	UPROPERTY()
 	TObjectPtr<class ULabHealthAttributeSet> HealthSet;
 
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	TArray<EMyAbilitySlotsEnum> AbilitiesArray;
+	
+	
 	
 public:
 	/** Returns CameraBoom subobject **/
